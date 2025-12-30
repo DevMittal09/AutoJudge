@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Code Runner Pro</title>
+  <style>
+    /* 1. Global Reset & Body */
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 1.5rem;
+      background: #f7f9fc;
+      color: #333;
+    }
+
+    /* 2. Layout Containers */
+    .container {
+      display: grid;
+      /* Two-column layout, second column is slightly smaller */
+      grid-template-columns: 3fr 2fr;
+      gap: 1.5rem;
+      max-width: 1400px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 30, 80, 0.08);
+    }
+
+    .column {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    /* 3. Controls Bar */
+    .controls-bar {
+      display: flex;
+      flex-wrap: wrap; /* Allow wrapping on small screens */
+      gap: 0.75rem;
+      align-items: center;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .controls-bar label {
+      font-weight: 600;
+      margin-right: -0.25rem;
+    }
+
+    /* Separate button group to the right */
+    .button-group {
+      margin-left: auto;
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    /* 4. Input Groups (Label + Control) */
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .input-group label {
+      font-weight: 600;
+      color: #444;
+    }
+
+    /* 5. Styled Controls (Select, Button, Textarea) */
+    select,
+    button {
+      padding: 0.6rem 1rem;
+      font-size: 0.95rem;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      background: #f9f9f9;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    select:focus,
+    button:focus,
+    textarea:focus {
+      border-color: #007bff;
+      box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+      outline: none;
+    }
+
+    button {
+      border: 1px solid transparent;
+      font-weight: 600;
+    }
+
+    /* Primary Button: "Submit" */
+    #submitBtn {
+      background: #007bff;
+      color: white;
+      border-color: #007bff;
+    }
+    #submitBtn:hover {
+      background: #0056b3;
+    }
+
+    /* Secondary Button: "Run" */
+    #runBtn {
+      background: #fff;
+      color: #007bff;
+      border-color: #007bff;
+    }
+    #runBtn:hover {
+      background: #f0f7ff;
+    }
+
+    /* 6. Textareas & Output */
+    textarea {
+      width: 100%;
+      font-family: "Fira Code", "Courier New", monospace;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 1rem;
+      resize: vertical; /* Allow vertical resize only */
+    }
+
+    #code {
+      height: 400px;
+    }
+
+    #custom-input {
+      height: 150px;
+    }
+
+    /* Dark theme for output */
+    #output {
+      background: #282c34; /* Dark background */
+      color: #abb2bf;     /* Light text */
+      padding: 1rem;
+      border-radius: 6px;
+      white-space: pre-wrap;  /* Wrap text */
+      word-wrap: break-word;  /* Break long words */
+      font-family: "Fira Code", "Courier New", monospace;
+      font-size: 0.9rem;
+      flex-grow: 1; /* Make it fill the column height */
+      min-height: 200px; /* Ensure it has a minimum height */
+      border: 1px solid #444;
+    }
+
+    /* 7. Responsive Design */
+    @media (max-width: 900px) {
+      .container {
+        grid-template-columns: 1fr; /* Stack columns */
+        padding: 1rem;
+      }
+
+      .controls-bar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .button-group {
+        margin-left: 0;
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr; /* Make buttons full-width on mobile */
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="column">
+      <div class="controls-bar">
+        <label for="language">Language:</label>
+        <select id="language">
+          <option value="python">Python</option>
+        </select>
+
+        <div class="button-group">
+          <button id="runBtn">Run with Custom Input</button>
+          <button id="submitBtn">Submit (Run All Tests)</button>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label for="code">Code:</label>
+        <p><b>Write a Code that takes input and return the addition of the two numbers.</b></p>
+        <textarea id="code" placeholder="Write your code here...">
+# Example code for addition
+try:
+  num1 = int(input())
+  num2 = int(input())
+  print(num1 + num2)
+except EOFError:
+  pass
+</textarea>
+      </div>
+
+      <div class="input-group">
+        <label for="custom-input">Custom Input:</label>
+        <textarea
+          id="custom-input"
+          class="custom-input"
+          placeholder="Enter your custom input here..."
+        ></textarea>
+      </div>
+    </div>
+
+    <div class="column">
+      <div class="input-group">
+        <label>Output</label>
+        <pre id="output">No output yet.</pre>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Your JavaScript code remains exactly the same
+    const runBtn = document.getElementById('runBtn');
+    const submitBtn = document.getElementById('submitBtn');
+    const output = document.getElementById('output');
+
+    runBtn.addEventListener('click', async () => {
+      const language = document.getElementById('language').value;
+      const code = document.getElementById('code').value;
+      const input_data = document.getElementById('custom-input').value;
+
+      await callSubmit({
+        language: language,
+        code: code,
+        timeout: 20,
+        input_data: input_data,
+      });
+    });
+
+    submitBtn.addEventListener('click', async () => {
+      const language = document.getElementById('language').value;
+      const code = document.getElementById('code').value;
+
+      await callSubmit({
+        language: language,
+        code: code,
+        timeout: 20,
+      });
+    });
+
+    async function callSubmit(submissionBody) {
+      output.textContent = 'Running...';
+      try {
+        const response = await fetch('http://localhost:8000/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(submissionBody),
+        });
+
+        if (!response.ok) {
+          let errMsg = `Error ${response.status}: `;
+          try {
+            const err = await response.json();
+            errMsg += err.detail || 'Unknown error';
+          } catch {
+            errMsg += 'Server returned non-JSON response.';
+          }
+          output.textContent = errMsg;
+          return;
+        }
+
+        const result = await response.json();
+        output.textContent = `Job: ${result.job}\nStatus: ${result.status}\n\nLogs:\n${result.logs}`;
+      } catch (err) {
+        output.textContent = 'Request failed: ' + err;
+      }
+    }
+  </script>
+</body>
+</html>

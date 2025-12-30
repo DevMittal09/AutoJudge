@@ -1,0 +1,30 @@
+Python / venv
+
+pycache/
+venv/
+*.pyc
+
+Next.js dependencies
+
+This path is now relative to the OELP_TEST folder
+
+oelp-frontend/node_modules/
+
+Next.js build files
+
+oelp-frontend/.next/
+
+Next.js Environment files (SECRETS!)
+
+oelp-frontend/.env.local
+oelp-frontend/.env.*.local
+
+Log files
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+Editor files
+
+.vscode
